@@ -38,22 +38,37 @@ Method **conjugate** returns Array: accepts named parameters :
 #### The notions used by the module:
  
  **SUBJECT:**
+ 
  The sentence's actor, any of *I he she it we you they*
  
+ 
+ 
  **TENSE:**
+ 
  The grammatical time of the action. "Time" is a physical notion, "Tense" a grammatical one. English has only 2 "Tense": Past and Present; The "Future" tense is a modality.
  Two Tenses are aviable: p = Present, sp = Past
  
+ 
+ 
  **MODALITY:**
+ 
  Allows speakers to evaluate a proposition relative to a set of other propositions (Necessity or Possibility). The "future" (will) stands for a Possibility.
  Modality is any of *will shall may can*.
  
+ 
+ 
  **VERB:**
+ 
  Conveys an action (bring, read, walk, run, learn), or a state of being (be, exist, stand).
  
+ 
+ 
  **VERBAL FORM:**
+ 
  Way in which a verb is structured in relation to time, BE+ING = Continuity, non-finite. HAVE+EN: Past event linked to the present, BE+EN: Passive verbal form
  Modality can be many of *HaveEn BeIng BeEn*
+
+
 
 #### Speculative Todo List
 
