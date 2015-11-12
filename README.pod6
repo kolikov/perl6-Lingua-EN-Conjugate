@@ -50,7 +50,7 @@ VERB:
   Conveys an action (bring, read, walk, run, learn), or a state of being (be, exist, stand).
 VERBAL FORM:
   Way in which a verb is structured in relation to time, BE+ING = Continuity, non-finite. HAVE+EN: Past event linked to the present, BE+EN: Passive verbal form
-  Modality can be many of <>
+  Modality can be many of <HaveEn BeIng BeEn>
 
 =head2 Speculative Todo List
 
