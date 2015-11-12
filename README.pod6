@@ -41,7 +41,7 @@ The notions used by the module:
 SUBJECT: 
   The sentence's actor, any of <I he she it we you they>.
 TENSE: 
-  The grammatical time of the action. "Time" is a phisical notion, "Tense" a grammatical one. English has only 2 "Tense": Past and Present; The "Future" tense is a modality.
+  The grammatical time of the action. "Time" is a physical notion, "Tense" a grammatical one. English has only 2 "Tense": Past and Present; The "Future" tense is a modality.
   Two Tenses are aviable: p = Present, sp = Past
 MODALITY:
   Allows speakers to evaluate a proposition relative to a set of other propositions (Necessity or Possibility). The "future" (will) stands for a Possibility.
