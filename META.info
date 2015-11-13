@@ -7,5 +7,6 @@
         "Lingua::EN::Conjugate" : "lib/Lingua/EN/Conjugate/Conjugate.pm6"
     },
     "depends" : [],
-    "source-url" : ""
+    "source-url" : "https://github.com/kolikov/perl6-Lingua-EN-Conjugate.git"
 }
+
