@@ -14,11 +14,15 @@
        }
      }
 
-### Methods details
+### Object, Methods and details
+
+Object **englishverb** must be created first with one only conmpulsory parameter 
+- **bare**          : String required, Bare form of the verb without the "to"
+  
+The object also accepts named parameters for method "conjugate at creation.
 
 Method **conjugate** returns Array: accepts named parameters :
 - **subject**       : String any of *I he she it we you they*
-- **bare**          : String required, Bare form of the verb without the "to"
 - **mod**           : String, any of *will shall may can*
 - **tense**         : String, any of *p sp* ; "p" = Present, "sp" = Past 
 - **forms**         : Array of String, many of = *BeIng BeEn HaveEn*;   BeIng = continuous,  BeEn = Passive, HaveEn = Perfect
