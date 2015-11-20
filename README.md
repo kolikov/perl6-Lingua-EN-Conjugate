@@ -13,7 +13,10 @@
          say $verb.conjugate( subject => $s );
        }
      }
-
+     
+     my @sentence = conjugate( bare => 'be', subject => 'it', interrogative => True );
+     say @sentence ~ ' a function ?';
+     
 ### Object, Methods and details
 
 Object **englishverb** must be created first with one only conmpulsory parameter 
@@ -22,14 +25,23 @@ Object **englishverb** must be created first with one only conmpulsory parameter
 The object also accepts named parameters for method "conjugate at creation.
 
 Method **conjugate** returns Array: accepts named parameters :
-- **subject**       : String any of *I he she it we you they*
-- **mod**           : String, any of *will shall may can*
-- **tense**         : String, any of *p sp* ; "p" = Present, "sp" = Past 
-- **forms**         : Array of String, many of = *BeIng BeEn HaveEn*;   BeIng = continuous,  BeEn = Passive, HaveEn = Perfect
+- **subject**       : String any of *I , he , she , it , we , you , they* , default self init
+- **alias**         : Replace the subject in the ouput array , default self init
+- **mod**           : String, any of *will , shall , may , can* , default self init
+- **tense**         : String, any of *p,sp* ; *"p" = Present, "sp" = Past* , default self init
+- **forms**         : Array of String, many of = *BeIng BeEn HaveEn*;   *BeIng=continuous,  BeEn=Passive, HaveEn=Perfect* , default self init
 - **negation**      : Bool default False;
 - **shortneg**      : Bool default False, use the short negation ( ex: [will not] => [won't] );
 - **interrogative** : Bool default False, Use interrogative form
 
+
+Method **is-irreg** returns Bool, accepts string default self bare
+- Tells if passed verb is irregular
+
+
+### Function usage
+- **Subroutine "conjugate"** accepts named parameter "bare" and all named parameters of the object method
+- **Subroutine "is-irreg"** behaves the as object method
 
 
 ### Purpose And Notes
@@ -76,7 +88,6 @@ Method **conjugate** returns Array: accepts named parameters :
 
 #### Speculative Todo List
 
-- Subject alias (ex: they/'Alexandra and Mary') 
 - Short forms for: "I am" "will" "would" etc ...
 - "be able to"
 - "used to"

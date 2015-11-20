@@ -39,10 +39,14 @@ my %shortnegs = "will" => "won't" , "shall" => "shan't" , "can" => "can't" , "ma
 
 
 
+# ---- -----
+# ---- ----- Object Oriented Things
+# ---- -----
 
 class englishverb is export {
   
   has $.subject       is rw = '';
+  has $.alias         is rw = '';  
   has $.bare          is rw is required;
   has $.mod           is rw = '';
   has $.tense         is rw = '';
@@ -56,12 +60,11 @@ class englishverb is export {
   }
   
   # --
-  # Atomic verb conjugate method, returns string.
-  # --
-  method conj ( 
+  # Private verb conjugate method, returns string.
+  method !conj ( 
     Str :$subject = $!subject , 
-    Str :$verb = $!bare , 
-    Str :$tense = $!tense ){
+    Str :$verb    = $!bare , 
+    Str :$tense   = $!tense ){
       
     my token consonant  { <-[aeiouy]>  } 
     my token vowel      { <+[aeiou]>   } 
@@ -82,7 +85,7 @@ class englishverb is export {
         return %aux{$verb}{$tense}{$subject}    if $verb eq %aux.keys.any;
         if $subject eq < he she it >.any {
           return $/[0] ~ 'ies'                  if $verb ~~ / ( .+ <consonant> ) y $$ /; 
-          return $/[0] ~ 'es'                   if $verb ~~ / ( .+ ) o $$ /; 
+          return $/[0] ~ 'oes'                  if $verb ~~ / ( .+ ) o $$ /; 
           return $/[0] ~ 'es'                   if $verb ~~ / ( .+ <sibilant> ) $$ /;          
           return $verb ~ 's';
         }
@@ -109,9 +112,9 @@ class englishverb is export {
 
   # --
   # Main conjugate method, returns Array.
-  # --  
   method conjugate ( 
     Str   :$subject = $!subject, 
+    Str   :$alias = $!alias,
     Bool  :$interrogative is copy = $!interrogative, 
     Bool  :$negation is copy = $!negation, 
     Bool  :$shortneg = $!shortneg, 
@@ -119,45 +122,47 @@ class englishverb is export {
     Str   :$mod = $!mod, 
     
           :@forms =@!forms ){
-      
-    my @returned;
-    
+
     # Fast-Return if no subject or tense
     return [$!bare] if $subject ne < I you he she it we they >.any || $tense ne < p sp >.any;
-    
-    # Real Stuff begins here ---->
-    @returned.push($subject) if ! $interrogative;
+      
+    my @returned;
+    my $neg_idx     = 0;                             # Trace the real "!"
+    my $verbal_idx  = $interrogative ?? 0 !! 1;      # Trace the position of the verbal candidate for "?" and "!" 
+        
+    # Subject or alias
+    @returned.push( $alias eq '' ?? $subject !! $alias ) if ! $interrogative;
     
     # Left To Right allocation of "tense" in compulsory order:  Modal -- Perfect -- Continuious -- Passive
     # "?" and "-" Flaged on/off at first encounter
     if $mod ne '' {
       @returned.push( %mods{$mod}{$tense} );
-      @returned.push('not')    if $negation;
-      @returned.push($subject) if $interrogative;
+      $neg_idx  = @returned.push('not').end                 if $negation;
+      @returned.push( $alias eq '' ?? $subject !! $alias )  if $interrogative;
       $tense = 'bi';
       $negation = False;
       $interrogative = False;
     }
     if 'HaveEn' eq @forms.any {
-      @returned.push( self.conj( subject => $subject, verb => 'have', tense => $tense ) ); 
-      @returned.push($subject) if $interrogative;
-      @returned.push('not')    if $negation;    
+      @returned.push( self!conj( subject => $subject, verb => 'have', tense => $tense ) ); 
+      @returned.push( $alias eq '' ?? $subject !! $alias )  if $interrogative;
+      $neg_idx = @returned.push('not').end                  if $negation;
       $tense = 'pp';
       $negation = False;
       $interrogative = False;
     }
     if 'BeIng' eq @forms.any {
-      @returned.push( self.conj( subject => $subject, verb => 'be', tense => $tense ) ); 
-      @returned.push('not')    if $negation;    
-      @returned.push($subject) if $interrogative;    
+      @returned.push( self!conj( subject => $subject, verb => 'be', tense => $tense ) ); 
+      $neg_idx = @returned.push('not').end                  if $negation;      
+      @returned.push( $alias eq '' ?? $subject !! $alias ) if $interrogative; 
       $tense = 'ing';
       $negation = False;
       $interrogative = False;
     }
     if 'BeEn' eq @forms.any {
-      @returned.push( self.conj( subject => $subject, verb => 'be', tense => $tense ) );
-      @returned.push('not')    if $negation;    
-      @returned.push($subject) if $interrogative;   
+      @returned.push( self!conj( subject => $subject, verb => 'be', tense => $tense ) );
+      $neg_idx = @returned.push('not').end                 if $negation;      
+      @returned.push( $alias eq '' ?? $subject !! $alias ) if $interrogative;   
       $tense = 'pp';
       $negation = False;
       $interrogative = False;
@@ -166,31 +171,56 @@ class englishverb is export {
     # Use of "do" for non-auxiliary verbs in interrogative and/or negative form if no previous "tense" allocation
     if $interrogative || $negation {
       if $!bare eq %aux.keys.any {
-        @returned.push( self.conj( subject => $subject, verb => $!bare, tense => $tense ) );
-        @returned.push($subject) if $interrogative;    
-        @returned.push('not')    if $negation;    
+        @returned.push( self!conj( subject => $subject, verb => $!bare, tense => $tense ) );
+        @returned.push( $alias eq '' ?? $subject !! $alias )  if $interrogative;    
+        $neg_idx = @returned.push('not').end                  if $negation;    
       }
       else {
-        @returned.push( self.conj( subject => $subject, verb => 'do', tense => $tense ) );
-        @returned.push('not')    if $negation;    
-        @returned.push($subject) if $interrogative;    
-        @returned.push( self.conj( subject => $subject, verb => $!bare, tense => 'bi' ) );
+        @returned.push( self!conj( subject => $subject, verb => 'do', tense => $tense ) );
+        $neg_idx  = @returned.push('not').end                 if $negation;    
+        @returned.push( $alias eq '' ?? $subject !! $alias )  if $interrogative;    
+        @returned.push( self!conj( subject => $subject, verb => $!bare, tense => 'bi' ) );
       }
     }
     else {
-      @returned.push( self.conj( subject => $subject, verb => $!bare, tense => $tense ) );
+      @returned.push( self!conj( subject => $subject, verb => $!bare, tense => $tense ) );
     }
     
-    # Handle short negation by reparsing the array for "not", then splice !
-    # Ugly but: $negation is/must-be copy !
-    if $shortneg && @returned.first(:k,/^^ not $$/) ~~ Int {
-      my $verbidx = @returned.first(:k,/^^ not $$/) -1;
-      if $verbidx.sign != -1 {
-        my $sneg    = @returned[$verbidx] eq %shortnegs.keys.any ?? %shortnegs{ @returned[$verbidx] } !! @returned[$verbidx] ~ "n't";
-        @returned.splice($verbidx,2,[$sneg]);
-      }
+    # Handle short negation by splicing "not" and short-negating "verbal candidate"
+    if $shortneg && $neg_idx > 0 {
+      my $sneg = @returned[$verbal_idx] eq %shortnegs.keys.any ?? %shortnegs{ @returned[$verbal_idx] } !! @returned[$verbal_idx] ~ "n't";      
+      @returned[$verbal_idx] = $sneg;
+      @returned.splice($neg_idx,1,[]);
     }
-      
+    
+    
     return @returned;
   }  
 }
+
+
+# ---- -----
+# ---- ----- Functional Things
+# ---- -----
+
+sub conjugate (
+  Str   :$bare, 
+  Str   :$subject = '', 
+  Str   :$alias = '', 
+  Bool  :$interrogative = False, 
+  Bool  :$negation = False, 
+  Bool  :$shortneg = False, 
+  Str   :$tense = 'p', 
+  Str   :$mod = '', 
+        :@forms = [] ) is export {
+  
+  my $v = englishverb.new( bare => $bare, alias => $alias, subject => $subject, interrogative => $interrogative , negation => $negation, shortneg => $shortneg, tense => $tense, mod => $mod, forms => @forms );
+  return $v.conjugate;
+  
+}
+
+sub is-erregular( Str $bare ){
+  return %irregs{$bare}.defined;
+}
+
+
